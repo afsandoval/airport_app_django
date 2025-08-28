@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Distancia entre Aeropuertos</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .main-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .calculator-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            max-width: 800px;
+            width: 100%;
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .card-header h1 {
+            margin: 0;
+            font-weight: 700;
+            font-size: 2rem;
+        }
+        
+        .card-header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+        }
+        
+        .form-section {
+            padding: 40px;
+        }
+        
+        .airport-input {
+            position: relative;
+            margin-bottom: 25px;
+        }
+        
+        .airport-input label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .airport-input input {
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            padding: 15px 20px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        
+        .airport-input input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            outline: none;
+        }
+        
+        .calculate-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .calculate-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .results-section {
+            padding: 0 40px 40px 40px;
+            display: none;
+        }
+        
+        .result-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 15px;
+            padding: 30px;
+            color: white;
+            margin-bottom: 20px;
+        }
+        
+        .airport-info {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            backdrop-filter: blur(10px);
+        }
+        
+        .distance-info {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            color: white;
+        }
+        
+        .distance-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+        
+        .distance-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .error-alert {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ffa500 100%);
+            border: none;
+            color: white;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-top: 20px;
+        }
+        
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .airplane-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .swap-btn {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .swap-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-50%) rotate(180deg);
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="calculator-card">
+            <div class="card-header">
+                <i class="fas fa-plane airplane-icon"></i>
+                <h1>Calculadora de Distancia entre Aeropuertos</h1>
+                <p>Calcula la distancia entre cualquier par de aeropuertos del mundo</p>
+            </div>
+            
+            <div class="form-section">
+                <form id="airportForm">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="airport-input">
+                                <label for="aeropuerto_origen">
+                                    <i class="fas fa-plane-departure"></i> 
+                                    Aeropuerto de Origen
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="aeropuerto_origen" 
+                                    name="aeropuerto_origen"
+                                    class="form-control" 
+                                    placeholder="Ej: BOG"
+                                    maxlength="3"
+                                    pattern="[A-Za-z]{3}"
+                                    title="Ingrese código IATA de 3 letras"
+                                    required
+                                >
+                                <small class="text-muted">Código IATA de 3 letras</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6" style="position: relative;">
+                            <div class="airport-input">
+                                <label for="aeropuerto_destino">
+                                    <i class="fas fa-plane-arrival"></i> 
+                                    Aeropuerto de Destino
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="aeropuerto_destino" 
+                                    name="aeropuerto_destino"
+                                    class="form-control" 
+                                    placeholder="Ej: MEX"
+                                    maxlength="3"
+                                    pattern="[A-Za-z]{3}"
+                                    title="Ingrese código IATA de 3 letras"
+                                    required
+                                >
+                                <small class="text-muted">Código IATA de 3 letras</small>
+                                <button type="button" class="swap-btn" id="swapBtn" title="Intercambiar aeropuertos">
+                                    <i class="fas fa-exchange-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="calculate-btn" id="calculateBtn">
+                        <i class="fas fa-calculator"></i> Calcular Distancia
+                    </button>
+                </form>
+                
+                <div class="loading-spinner" id="loadingSpinner">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Calculando...</span>
+                    </div>
+                    <p class="mt-2">Calculando distancia...</p>
+                </div>
+                
+                <div id="errorAlert"></div>
+            </div>
+            
+            <div class="results-section" id="resultsSection">
+                <div class="result-card">
+                    <h3><i class="fas fa-route"></i> Información del Vuelo</h3>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="airport-info">
+                                <h5><i class="fas fa-plane-departure"></i> Origen</h5>
+                                <p id="origenInfo">-</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="airport-info">
+                                <h5><i class="fas fa-plane-arrival"></i> Destino</h5>
+                                <p id="destinoInfo">-</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="distance-info">
+                    <h4><i class="fas fa-ruler"></i> Distancia Calculada</h4>
+                    <div class="row text-center">
+                        <div class="col-md-4">
+                            <div class="distance-value" id="distanciaKm">-</div>
+                            <div class="distance-label">Kilómetros</div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="distance-value" id="distanciaMillas">-</div>
+                            <div class="distance-label">Millas</div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="distance-value" id="distanciaNauticas">-</div>
+                            <div class="distance-label">Millas Náuticas</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('airportForm');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const resultsSection = document.getElementById('resultsSection');
+            const errorAlert = document.getElementById('errorAlert');
+            const calculateBtn = document.getElementById('calculateBtn');
+            const swapBtn = document.getElementById('swapBtn');
+            
+            // Función para intercambiar aeropuertos
+            swapBtn.addEventListener('click', function() {
+                const origen = document.getElementById('aeropuerto_origen');
+                const destino = document.getElementById('aeropuerto_destino');
+                
+                const temp = origen.value;
+                origen.value = destino.value;
+                destino.value = temp;
+            });
+            
+            // Convertir a mayúsculas automáticamente
+            document.getElementById('aeropuerto_origen').addEventListener('input', function(e) {
+                e.target.value = e.target.value.toUpperCase();
+            });
+            
+            document.getElementById('aeropuerto_destino').addEventListener('input', function(e) {
+                e.target.value = e.target.value.toUpperCase();
+            });
+            
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Limpiar errores previos
+                errorAlert.innerHTML = '';
+                resultsSection.style.display = 'none';
+                
+                // Mostrar spinner
+                loadingSpinner.style.display = 'block';
+                calculateBtn.disabled = true;
+                
+                // Obtener datos del formulario
+                const formData = new FormData(form);
+                
+                // Realizar petición
+                fetch('/calculate/', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    loadingSpinner.style.display = 'none';
+                    calculateBtn.disabled = false;
+                    
+                    if (data.success) {
+                        // Mostrar resultados
+                        document.getElementById('origenInfo').innerHTML = 
+                            `<strong>${data.aeropuerto_origen.codigo}</strong><br>
+                             ${data.aeropuerto_origen.nombre}<br>
+                             <small>${data.aeropuerto_origen.ciudad}</small>`;
+                        
+                        document.getElementById('destinoInfo').innerHTML = 
+                            `<strong>${data.aeropuerto_destino.codigo}</strong><br>
+                             ${data.aeropuerto_destino.nombre}<br>
+                             <small>${data.aeropuerto_destino.ciudad}</small>`;
+                        
+                        document.getElementById('distanciaKm').textContent = 
+                            Number(data.distancia_km).toLocaleString('es-ES');
+                        
+                        document.getElementById('distanciaMillas').textContent = 
+                            Number(data.distancia_millas).toLocaleString('es-ES');
+                        
+                        document.getElementById('distanciaNauticas').textContent = 
+                            Number(data.distancia_millas_nauticas).toLocaleString('es-ES');
+                        
+                        resultsSection.style.display = 'block';
+                        
+                        // Scroll suave hacia los resultados
+                        resultsSection.scrollIntoView({ behavior: 'smooth' });
+                        
+                    } else {
+                        // Mostrar error
+                        errorAlert.innerHTML = 
+                            `<div class="alert error-alert">
+                                <i class="fas fa-exclamation-triangle"></i> 
+                                ${data.error}
+                             </div>`;
+                    }
+                })
+                .catch(error => {
+                    loadingSpinner.style.display = 'none';
+                    calculateBtn.disabled = false;
+                    
+                    errorAlert.innerHTML = 
+                        `<div class="alert error-alert">
+                            <i class="fas fa-exclamation-triangle"></i> 
+                            Error de conexión. Intente nuevamente.
+                         </div>`;
+                });
+            });
+        });
+    </script>
+</body>
+</html>

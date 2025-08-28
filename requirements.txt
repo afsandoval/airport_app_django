@@ -1,0 +1,7 @@
+# Instalacion de Dependencias para el proyecto Django
+
+Django==4.2.7
+requests==2.31.0
+
+# Para instalar las dependencias, ejecutar:
+# pip install -r requirements.txt
