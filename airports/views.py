@@ -7,13 +7,20 @@ import json
 
 #  Contiene la lógica para procesar las peticiones a la API de Airport Gap
 
+
+# Vista principal que muestra el formulario:
+
 def airport_distance_view(request):
-    """Vista principal que muestra el formulario"""
+
     return render(request, 'airport_distance.html')
 
-@csrf_exempt
+@csrf_exempt # Desactivar CSRF para simplificar las pruebas con herramientas externas
+
+
+# Vista que procesa el cálculo de distancia entre aeropuertos:
+
 def calculate_distance(request):
-    """Vista que procesa el cálculo de distancia entre aeropuertos"""
+
     if request.method == 'POST':
         try:
             # Obtener datos del formulario
@@ -32,6 +39,13 @@ def calculate_distance(request):
                 return JsonResponse({
                     'success': False,
                     'error': 'Los códigos IATA deben tener exactamente 3 caracteres'
+                })
+                
+            # Validar que los aeropuertos NO sean iguales
+            if aeropuerto_origen == aeropuerto_destino:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Los codigos IATA de los aeropuertos no pueden ser el mismo'
                 })
             
             # URL de la API

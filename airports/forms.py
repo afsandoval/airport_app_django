@@ -6,7 +6,7 @@ class AirportDistanceForm(forms.Form):
     aeropuerto_origen = forms.CharField(
         max_length=3,
         min_length=3,
-        widget=forms.TextInput(attrs={
+        widget=forms.TextInput(attrs={ # Atributos HTML para el input
             'class': 'form-control',
             'placeholder': 'Ej: BOG',
             'pattern': '[A-Z]{3}',
@@ -27,14 +27,14 @@ class AirportDistanceForm(forms.Form):
         label='Aeropuerto de Destino (Código IATA)'
     )
 
-    def clean_aeropuerto_origen(self):
+    def clean_aeropuerto_origen(self): # Validar que el código contenga solo letras
         codigo = self.cleaned_data['aeropuerto_origen'].upper()
-        if not codigo.isalpha():
+        if not codigo.isalpha(): # Solo letras
             raise forms.ValidationError("El código debe contener solo letras.")
         return codigo
 
-    def clean_aeropuerto_destino(self):
+    def clean_aeropuerto_destino(self): # Validar que el código contenga solo letras
         codigo = self.cleaned_data['aeropuerto_destino'].upper()
-        if not codigo.isalpha():
+        if not codigo.isalpha(): # Solo letras
             raise forms.ValidationError("El código debe contener solo letras.")
         return codigo
